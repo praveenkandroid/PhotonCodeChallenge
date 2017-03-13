@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">CodeChallenge</string>
+    <string name="tv_heading">Please enter the number of Rows and Columsn</string>
+
+</resources>
