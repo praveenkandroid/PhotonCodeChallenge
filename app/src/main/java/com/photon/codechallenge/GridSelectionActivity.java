@@ -22,9 +22,9 @@ import com.photon.codechallenge.utilities.Utils;
 
 public class GridSelectionActivity extends FragmentActivity {
 
-    FragmentManager fragmentManager;
-    int[][] matrix;
-    int numRows,numCols,gridSize;
+    public FragmentManager fragmentManager;
+    public  int[][] matrix;
+    public int numRows,numCols,gridSize;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

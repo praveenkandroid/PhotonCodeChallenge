@@ -1,5 +1,6 @@
 package com.photon.codechallenge;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -21,10 +22,10 @@ import java.util.List;
 
 public class ResultFragment extends Fragment {
     //Variables declaration
-    private int count =0;
     private int pathOfLowestCost = 0;
     private String status = "NO";
     private int rowLength = 0;
+    private int colLength = 0;
     private GridSelectionActivity parent;
     private TextView tvMin,tvSurrounding,tvSum;
     private String pathString="";
@@ -42,18 +43,37 @@ public class ResultFragment extends Fragment {
          tvSurrounding = (TextView) linearLayout.findViewById(R.id.tv2);
          tvSum = (TextView) linearLayout.findViewById(R.id.tv3);
         rowLength=parent.matrix.length;
-        findSurroundingElements(parent.matrix,0,0);
-        tvMin.setText(status);
-        tvSurrounding.setText("["+pathString+"]");
-        tvSum.setText(pathOfLowestCost+"");
+        colLength =  parent.matrix[0].length;
 
+        LowCostAsync lowCostAsync = new LowCostAsync();
+        lowCostAsync.execute();
 
         return linearLayout;
     }
     /*
-	 * this method used to find the surrounding elements*/
+    * Asynctask to check the pathofLow cost*/
+    private class LowCostAsync extends AsyncTask<Void,Void,String>
+    {
+
+        @Override
+        protected String doInBackground(Void... voids) {
+            findSurroundingElements(parent.matrix,0,0);
+
+            return pathString;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            tvMin.setText(status);
+            tvSurrounding.setText("["+pathString+"]");
+            tvSum.setText(pathOfLowestCost+"");
+        }
+    }
+
+/* this method used to find the surrounding elements*/
     public  void findSurroundingElements(int[][] m, int indexX, int indexY) {
-        count++;
+        Boolean flag = false;
         if (m == null) {
             throw new NullPointerException("The input matrix cannot be null");
         }
@@ -63,18 +83,18 @@ public class ResultFragment extends Fragment {
         int i = indexX;
         int j = indexY;
 
-        for(int i1= i+1;(i1<=i+1) && (rowLength >= i1);i1++)
+        for (int i1 = j+1; (i1<=(j+1) && i1<(colLength)); i1++)
         {
-            for (int j1=Math.min(0, j);j1<=j+1;j1++)
+            for (int j1= ((i-1) == -1 ? 0 : (i-1)) ; j1<=Math.min(rowLength-1,j+1); j1++)
             {
-                dBean = new DataBean(m[j1][i1], i1, j1);
+                flag = true;
+                dBean = new DataBean(m[j1][i1], j1, i1);
                 if(dBean != null){
                     eleList.add(dBean);
                 }
             }
         }
-
-        if(count<=rowLength){
+        if(flag){
             findMinimumValueFromList(eleList,m);
         }
     }
@@ -87,10 +107,9 @@ public class ResultFragment extends Fragment {
         if(pathString.length()==0)
             pathString=pathString+ eleList.get(0).getValue();
         else
-        pathString=pathString+","+ eleList.get(0).getValue();
-
+            pathString=pathString+","+ eleList.get(0).getValue();
         System.out.println(eleList.get(0).getValue());
-        if(eleList.get(0).getyIndex()==m.length){
+        if(eleList.get(0).getxIndex()== rowLength-1){
             status = "YES";
         }
         findSurroundingElements(m,eleList.get(0).getxIndex(),eleList.get(0).getyIndex());
